@@ -1,13 +1,36 @@
 #include <stdio.h>
 #include <cblas.h>
 #include <string.h>
+#if _MSC_VER
+#include <complex.h>
+#define lapack_complex_float _Fcomplex
+#define lapack_complex_double _Dcomplex
+#endif
+#include <lapacke.h>
+
 
 void test_info(int argc, char *argv[])
 {
+    printf("sizeof(blasint)=%zd bit\n",sizeof(blasint)*8);
+    printf("sizeof(CBLAS_INDEX)=%zd bit\n",sizeof(CBLAS_INDEX)*8);
+    printf("sizeof(lapack_int)=%zd bit\n",sizeof(lapack_int)*8);
+    printf("sizeof(int)=%zd bit\n",sizeof(int)*8);
+    printf("sizeof(long)=%zd bit\n",sizeof(long)*8);
+    printf("sizeof(long long)=%zd bit\n",sizeof(long long)*8);
+    printf("sizeof(size_t)=%zd bit\n",sizeof(size_t)*8);
     printf("threads=%d\n",openblas_get_num_threads());
     printf("procs=%d\n",openblas_get_num_procs());
     printf("config=%s\n",openblas_get_config());
     printf("corename=%s\n",openblas_get_corename());
+    int para_mode = openblas_get_parallel();
+    char *para_str;
+    switch(para_mode) {
+        case OPENBLAS_SEQUENTIAL: { para_str = "SEQUENTIAL"; break; } /* OpenBLAS is compiled for sequential use  */
+        case OPENBLAS_THREAD:     { para_str = "THREAD"; break; }     /* OpenBLAS is compiled using normal threading model */
+        case OPENBLAS_OPENMP:     { para_str = "OPENMP"; break; }     /* OpenBLAS is compiled using OpenMP threading model */
+        default:                  { para_str = "UNKNOWN"; break; }
+    }
+    printf("parallel=%d(%s)\n",para_mode,para_str);
     printf("--\n");
     printf("\n");
 }
