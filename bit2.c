@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <cblas.h>
 #include <string.h>
 #if _MSC_VER
@@ -58,7 +59,7 @@ void test_sasum(int argc, char *argv[])
     //                 0     1     2     3     4     5     6     7     8     9
     float x2[20] = {  1.0,  -1.0,  1.0,  -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,
                      10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0};
-    printf("sasum=%d\n",sasum(n, x2, incx));
+    printf("sasum=%f\n",cblas_sasum(n, x2, incx));
     //printf("ssum=%d\n", ssum( n, x2, incx));
     printf("--\n");
 }
