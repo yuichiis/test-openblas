@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <cblas.h>
 #include <string.h>
+#include <stdlib.h>
 
 void test_info(int argc, char *argv[])
 {
