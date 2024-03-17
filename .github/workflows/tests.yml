@@ -1,0 +1,27 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: true
+  
+    steps:
+      - name: Checkout codes
+        uses: "actions/checkout@v4"
+
+      - name: build
+        run: |
+          cd linux
+          cc bit2.c `pkg-config openblas --libs`
+
+      - name: run
+        run: |
+          cd linux
+          ./a.out
