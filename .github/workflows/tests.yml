@@ -16,6 +16,10 @@ jobs:
       - name: Checkout codes
         uses: "actions/checkout@v4"
 
+      - name: Install OpenBLAS 
+        run: |
+          sudo apt install -y libopenblas-base liblapacke
+
       - name: build
         run: |
           cd linux
