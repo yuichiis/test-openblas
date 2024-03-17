@@ -30,4 +30,4 @@ jobs:
       - name: run
         run: |
           cd linux
-          ./bit2
+          ./bit2 isamax 20 1
