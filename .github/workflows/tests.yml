@@ -18,8 +18,8 @@ jobs:
 
       - name: Install OpenBLAS 
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libopenblas-base liblapacke
+          sudo apt-get update -y
+          sudo apt-get install -y libopenblas-dev liblapacke-dev
           pkg-config openblas --libs
 
       - name: build
