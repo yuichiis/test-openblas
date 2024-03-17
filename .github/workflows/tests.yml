@@ -25,9 +25,9 @@ jobs:
       - name: build
         run: |
           cd linux
-          cc bit2.c `pkg-config openblas --libs`
+          cc bit2.c `pkg-config openblas --libs` -o bit2
 
       - name: run
         run: |
           cd linux
-          ./a.out
+          ./bit2
