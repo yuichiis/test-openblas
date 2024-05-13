@@ -72,6 +72,7 @@ jobs:
       - name: build (windows)
         if: ${{ startsWith(matrix.os, 'windows-') }}
         run: |
+          echo $env:PATH
           cl -IOpenBLAS\include /MD bit2.c OpenBLAS\lib\libopenblas.lib
           cl -IOpenBLAS\include /MD tst_edgesvd.c OpenBLAS\lib\libopenblas.lib
 
