@@ -41,6 +41,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'macos-') }}
         run: |
           brew install openblas
+          export PKG_CONFIG_PATH=$(brew --prefix)/opt/openblas/lib/pkgconfig:$PKG_CONFIG_PATH          
           pkg-config openblas --libs
 
       - name: build
@@ -52,8 +53,9 @@ jobs:
       - name: build (macOS)
         if: ${{ startsWith(matrix.os, 'macos-') }}
         run: |
+          export PKG_CONFIG_PATH=$(brew --prefix)/opt/openblas/lib/pkgconfig:$PKG_CONFIG_PATH          
           cd macos
-          cc bit2.c `pkg-config openblas --libs` -o bit2
+          cc `pkg-config openblas --cflags` bit2.c `pkg-config openblas --libs` -o bit2
 
       - name: run
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
