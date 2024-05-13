@@ -22,18 +22,25 @@ class OpenBLASClientGenerator
     public array $funcDecrWord = [
         'int','char*','void','float','double','CBLAS_INDEX',
         //'openblas_complex_float','openblas_complex_double',
+        'lapack_int',
+        //'lapack_complex_float','lapack_complex_double',
     ];
 
-    public function generator($inputfile,$outputfile) : void
+    public string $preg_types;
+
+    public function __construct()
     {
-        $excludeFuncs = $this->excludeFuncs;
+        $this->preg_types = implode('|',array_map(fn($x) => str_replace('*','\\*',$x),$this->funcDecrWord));
+    }
+
+    public function generator($argv)
+    {
+        $dummy = array_shift($argv);
+        $outputfile = array_shift($argv);
         $fpi = null;
         $fpo = null;
+        $funcs = [];
         try {
-            $fpi = fopen($inputfile,'r');
-            if($fpi==null) {
-                throw new RuntimeException("Error opening input file: $inputfile");
-            }
             $fpo = fopen($outputfile,'w');
             if($fpo==null) {
                 throw new RuntimeException("Error opening input file: $outputfile");
@@ -42,42 +49,12 @@ class OpenBLASClientGenerator
             if(!fwrite($fpo,$code)) {
                 throw new RuntimeException("fwrite error");
             }
-            $eof = false;
-            while(!$eof) {
-                $line='';
-                while(true) {
-                    $next=fgets($fpi);
-                    if(!$next) {
-                        $eof = true;
-                        break;
-                    }
-                    $next = trim($next);
-                    if(substr($next,0,1)=='#') {
-                        break;
-                    }
-                    if(substr($next,0,2)=='/*') {
-                        break;
-                    }
-                    if(substr($next,0,2)=='//') {
-                        break;
-                    }
-                    $line .= trim($next);
-                    if(substr($next,-1,1)==';') {
-                        break;
-                    }
+            while($inputfile=array_shift($argv)) {
+                $fpi = fopen($inputfile,'r');
+                if($fpi==null) {
+                    throw new RuntimeException("Error opening input file: $inputfile");
                 }
-                $declare = $this->parser($line);
-                if($declare==null) {
-                    continue;
-                }
-                if(in_array($declare['func'],$excludeFuncs)) {
-                    continue;
-                }
-                $code = $this->funcTemplate($declare);
-                if(!fwrite($fpo,$code)) {
-                    throw new RuntimeException("fwrite error");
-                }
-                $funcs[] = $declare;
+                $funcs = array_merge($funcs,$this->generate($fpo,$fpi));
             }
             $code = $this->endTemplate($funcs);
             if(!fwrite($fpo,$code)) {
@@ -93,6 +70,54 @@ class OpenBLASClientGenerator
         }
     }
     
+    public function generate($fpo,$fpi) : array
+    {
+        $excludeFuncs = $this->excludeFuncs;
+        $eof = false;
+        $funcs = [];
+        while(!$eof) {
+            $line='';
+            while(true) {
+                $next=fgets($fpi);
+                if(!$next) {
+                    $eof = true;
+                    break;
+                }
+                $next = trim($next);
+                if(substr($next,0,1)=='#') {
+                    break;
+                }
+                if(substr($next,0,2)=='/*') {
+                    break;
+                }
+                if(substr($next,0,2)=='//') {
+                    break;
+                }
+                $line .= trim($next);
+                if(substr($next,-1,1)==';') {
+                    break;
+                }
+            }
+            $declare = $this->parser($line);
+            //var_dump($line);
+            //var_dump($declare);
+            //echo "PAUSE>";
+            //fgets(STDIN);
+            if($declare==null) {
+                continue;
+            }
+            if(in_array($declare['func'],$excludeFuncs)) {
+                continue;
+            }
+            $code = $this->funcTemplate($declare);
+            if(!fwrite($fpo,$code)) {
+                throw new RuntimeException("fwrite error");
+            }
+            $funcs[] = $declare;
+        }
+        return $funcs;
+    }
+    
     public function parser(string $line) : ?array
     {
         $funcDecrWord = $this->funcDecrWord;
@@ -101,23 +126,25 @@ class OpenBLASClientGenerator
         if(!in_array($head,$funcDecrWord)) {
             return null;
         }
-        preg_match("/^(int|char\\*|void|float|double|CBLAS_INDEX) *([a-z0-9_]+) *\(([^)]+)/",$line,$match);
+        $pattern = "/^(".$this->preg_types.") *([A-Za-z0-9_]+) *\\(([^)]+)/";
+        //var_dump($pattern);
+        preg_match($pattern,$line,$match);
         if(array_key_exists(1,$match)) {
             $return = $match[1];
         } else {
-            var_dump("$line");
+            var_dump("unmatch return $line");
             $return = "unknown";
         }
         if(array_key_exists(2,$match)) {
             $func = $match[2];
         } else {
-            var_dump("$line");
+            var_dump("unmatch func $line");
             $func = "unknown";
         }
         if(array_key_exists(3,$match)) {
             $args = $match[3];
         } else {
-            var_dump("$line");
+            var_dump("unmatch args $line");
             $args = ["unknown","unknown"];
         }
         $args = explode(',',$args);
@@ -193,7 +220,7 @@ class OpenBLASClientGenerator
         $code .= "\n";
         $code .= ")\n";
         $code .= "{\n";
-        $code .= "    if(_g_{$funcname}==NULL) {\n";
+        $code .= "    if(_h_openblas==NULL || _g_{$funcname}==NULL) {\n";
         if($return=='void') {
             $code .= "        return;\n";
         } else {
@@ -232,12 +259,12 @@ class OpenBLASClientGenerator
         $code .= "\n";
         $code .= "#define LOADFUNC(funcname) \\\n";
         $code .= "_g_##funcname = (PFN##funcname)GetProcAddress( _h_openblas, #funcname ); \\\n";
-        $code .= "if(!_g_##funcname) { \\\n";
-        $code .= "    printf(\"load error: %s\",  #funcname); \\\n";
+        $code .= "if(_g_##funcname==NULL) { \\\n";
+        $code .= "    printf(\"load error: %s\\n\",  #funcname); \\\n";
         $code .= "    return -1; \\\n";
         $code .= "} \\\n";
         $code .= "\n";
-        $code .= "static HMODULE _h_openblas = 0;\n";
+        $code .= "static HMODULE _h_openblas = NULL;\n";
         return $code;
     }
     
@@ -245,12 +272,12 @@ class OpenBLASClientGenerator
     {
         $code  = "int rindow_load_openblas_dll()\n";
         $code .= "{\n";
-        $code .= "    if(_h_openblas) {\n";
+        $code .= "    if(_h_openblas!=NULL) {\n";
         $code .= "        return 0;\n";
         $code .= "    }\n";
         $code .= "    _h_openblas = LoadLibraryA( \"libopenblas.dll\" );\n";
         $code .= "    if(_h_openblas==NULL) {\n";
-        $code .= "        printf(\"load error: libopenblas\");\n";
+        $code .= "        printf(\"load error: libopenblas\\n\");\n";
         $code .= "        return -1;\n";
         $code .= "    }\n";
         foreach($funcs as $declare) {
@@ -262,11 +289,11 @@ class OpenBLASClientGenerator
         $code .= "void rindow_unload_openblas_dll()\n";
         $code .= "{\n";
         $code .= "    FreeLibrary( _h_openblas );\n";
-        $code .= "    _h_openblas = 0;\n";
+        $code .= "    _h_openblas = NULL;\n";
         $code .= "}\n";
         return $code;
     }
 }
 
 $generator = new OpenBLASClientGenerator();
-$generator->generator($argv[1],$argv[2]);
+$generator->generator($argv);

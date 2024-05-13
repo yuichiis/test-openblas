@@ -28,8 +28,6 @@ char* openblas_get_corename(void);
 #ifdef OPENBLAS_OS_LINUX
 /* Sets thread affinity for OpenBLAS threads. `thread_idx` is in [0, openblas_get_num_threads()-1]. */
 int openblas_setaffinity(int thread_idx, size_t cpusetsize, cpu_set_t* cpu_set);
-/* Queries thread affinity for OpenBLAS threads. `thread_idx` is in [0, openblas_get_num_threads()-1]. */
-int openblas_getaffinity(int thread_idx, size_t cpusetsize, cpu_set_t* cpu_set);
 #endif
 
 /* Get the parallelization type which is used by OpenBLAS */
@@ -350,7 +348,7 @@ void cblas_cher2k(OPENBLAS_CONST enum CBLAS_ORDER Order, OPENBLAS_CONST enum CBL
 void cblas_zher2k(OPENBLAS_CONST enum CBLAS_ORDER Order, OPENBLAS_CONST enum CBLAS_UPLO Uplo, OPENBLAS_CONST enum CBLAS_TRANSPOSE Trans, OPENBLAS_CONST blasint N, OPENBLAS_CONST blasint K,
                   OPENBLAS_CONST void *alpha, OPENBLAS_CONST void *A, OPENBLAS_CONST blasint lda, OPENBLAS_CONST void *B, OPENBLAS_CONST blasint ldb, OPENBLAS_CONST double beta, void *C, OPENBLAS_CONST blasint ldc);
 
-void cblas_xerbla(blasint p, OPENBLAS_CONST char *rout, OPENBLAS_CONST char *form, ...);
+void cblas_xerbla(blasint p, char *rout, char *form, ...);
 
 /*** BLAS extensions ***/
 

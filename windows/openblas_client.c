@@ -4,12 +4,12 @@
 
 #define LOADFUNC(funcname) \
 _g_##funcname = (PFN##funcname)GetProcAddress( _h_openblas, #funcname ); \
-if(!_g_##funcname) { \
-    printf("load error: %s",  #funcname); \
+if(_g_##funcname==NULL) { \
+    printf("load error: %s\n",  #funcname); \
     return -1; \
 } \
 
-static HMODULE _h_openblas = 0;
+static HMODULE _h_openblas = NULL;
 typedef void (CALLBACK* PFNopenblas_set_num_threads)( /* openblas_set_num_threads */
     int            /* num_threads */
 );
@@ -18,7 +18,7 @@ void openblas_set_num_threads(
     int            num_threads
 )
 {
-    if(_g_openblas_set_num_threads==NULL) {
+    if(_h_openblas==NULL || _g_openblas_set_num_threads==NULL) {
         return;
     }
     _g_openblas_set_num_threads(
@@ -33,7 +33,7 @@ void goto_set_num_threads(
     int            num_threads
 )
 {
-    if(_g_goto_set_num_threads==NULL) {
+    if(_h_openblas==NULL || _g_goto_set_num_threads==NULL) {
         return;
     }
     _g_goto_set_num_threads(
@@ -48,7 +48,7 @@ int openblas_get_num_threads(
     void            
 )
 {
-    if(_g_openblas_get_num_threads==NULL) {
+    if(_h_openblas==NULL || _g_openblas_get_num_threads==NULL) {
         return 0;
     }
     return _g_openblas_get_num_threads(
@@ -63,7 +63,7 @@ int openblas_get_num_procs(
     void            
 )
 {
-    if(_g_openblas_get_num_procs==NULL) {
+    if(_h_openblas==NULL || _g_openblas_get_num_procs==NULL) {
         return 0;
     }
     return _g_openblas_get_num_procs(
@@ -78,7 +78,7 @@ char* openblas_get_config(
     void            
 )
 {
-    if(_g_openblas_get_config==NULL) {
+    if(_h_openblas==NULL || _g_openblas_get_config==NULL) {
         return 0;
     }
     return _g_openblas_get_config(
@@ -93,7 +93,7 @@ char* openblas_get_corename(
     void            
 )
 {
-    if(_g_openblas_get_corename==NULL) {
+    if(_h_openblas==NULL || _g_openblas_get_corename==NULL) {
         return 0;
     }
     return _g_openblas_get_corename(
@@ -108,7 +108,7 @@ int openblas_get_parallel(
     void            
 )
 {
-    if(_g_openblas_get_parallel==NULL) {
+    if(_h_openblas==NULL || _g_openblas_get_parallel==NULL) {
         return 0;
     }
     return _g_openblas_get_parallel(
@@ -133,7 +133,7 @@ float cblas_sdsdot(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_sdsdot==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sdsdot==NULL) {
         return 0;
     }
     return _g_cblas_sdsdot(
@@ -161,7 +161,7 @@ double cblas_dsdot(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_dsdot==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dsdot==NULL) {
         return 0;
     }
     return _g_cblas_dsdot(
@@ -188,7 +188,7 @@ float cblas_sdot(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_sdot==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sdot==NULL) {
         return 0;
     }
     return _g_cblas_sdot(
@@ -215,7 +215,7 @@ double cblas_ddot(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_ddot==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ddot==NULL) {
         return 0;
     }
     return _g_cblas_ddot(
@@ -244,7 +244,7 @@ void cblas_cdotu_sub(
     void *            ret
 )
 {
-    if(_g_cblas_cdotu_sub==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cdotu_sub==NULL) {
         return;
     }
     _g_cblas_cdotu_sub(
@@ -274,7 +274,7 @@ void cblas_cdotc_sub(
     void *            ret
 )
 {
-    if(_g_cblas_cdotc_sub==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cdotc_sub==NULL) {
         return;
     }
     _g_cblas_cdotc_sub(
@@ -304,7 +304,7 @@ void cblas_zdotu_sub(
     void *            ret
 )
 {
-    if(_g_cblas_zdotu_sub==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zdotu_sub==NULL) {
         return;
     }
     _g_cblas_zdotu_sub(
@@ -334,7 +334,7 @@ void cblas_zdotc_sub(
     void *            ret
 )
 {
-    if(_g_cblas_zdotc_sub==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zdotc_sub==NULL) {
         return;
     }
     _g_cblas_zdotc_sub(
@@ -358,7 +358,7 @@ float cblas_sasum(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_sasum==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sasum==NULL) {
         return 0;
     }
     return _g_cblas_sasum(
@@ -379,7 +379,7 @@ double cblas_dasum(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_dasum==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dasum==NULL) {
         return 0;
     }
     return _g_cblas_dasum(
@@ -400,7 +400,7 @@ float cblas_scasum(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_scasum==NULL) {
+    if(_h_openblas==NULL || _g_cblas_scasum==NULL) {
         return 0;
     }
     return _g_cblas_scasum(
@@ -421,7 +421,7 @@ double cblas_dzasum(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_dzasum==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dzasum==NULL) {
         return 0;
     }
     return _g_cblas_dzasum(
@@ -442,7 +442,7 @@ float cblas_ssum(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_ssum==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ssum==NULL) {
         return 0;
     }
     return _g_cblas_ssum(
@@ -463,7 +463,7 @@ double cblas_dsum(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_dsum==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dsum==NULL) {
         return 0;
     }
     return _g_cblas_dsum(
@@ -484,7 +484,7 @@ float cblas_scsum(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_scsum==NULL) {
+    if(_h_openblas==NULL || _g_cblas_scsum==NULL) {
         return 0;
     }
     return _g_cblas_scsum(
@@ -505,7 +505,7 @@ double cblas_dzsum(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_dzsum==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dzsum==NULL) {
         return 0;
     }
     return _g_cblas_dzsum(
@@ -526,7 +526,7 @@ float cblas_snrm2(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_snrm2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_snrm2==NULL) {
         return 0;
     }
     return _g_cblas_snrm2(
@@ -547,7 +547,7 @@ double cblas_dnrm2(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_dnrm2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dnrm2==NULL) {
         return 0;
     }
     return _g_cblas_dnrm2(
@@ -568,7 +568,7 @@ float cblas_scnrm2(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_scnrm2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_scnrm2==NULL) {
         return 0;
     }
     return _g_cblas_scnrm2(
@@ -589,7 +589,7 @@ double cblas_dznrm2(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_dznrm2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dznrm2==NULL) {
         return 0;
     }
     return _g_cblas_dznrm2(
@@ -610,7 +610,7 @@ CBLAS_INDEX cblas_isamax(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_isamax==NULL) {
+    if(_h_openblas==NULL || _g_cblas_isamax==NULL) {
         return 0;
     }
     return _g_cblas_isamax(
@@ -631,7 +631,7 @@ CBLAS_INDEX cblas_idamax(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_idamax==NULL) {
+    if(_h_openblas==NULL || _g_cblas_idamax==NULL) {
         return 0;
     }
     return _g_cblas_idamax(
@@ -652,7 +652,7 @@ CBLAS_INDEX cblas_icamax(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_icamax==NULL) {
+    if(_h_openblas==NULL || _g_cblas_icamax==NULL) {
         return 0;
     }
     return _g_cblas_icamax(
@@ -673,7 +673,7 @@ CBLAS_INDEX cblas_izamax(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_izamax==NULL) {
+    if(_h_openblas==NULL || _g_cblas_izamax==NULL) {
         return 0;
     }
     return _g_cblas_izamax(
@@ -694,7 +694,7 @@ CBLAS_INDEX cblas_isamin(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_isamin==NULL) {
+    if(_h_openblas==NULL || _g_cblas_isamin==NULL) {
         return 0;
     }
     return _g_cblas_isamin(
@@ -715,7 +715,7 @@ CBLAS_INDEX cblas_idamin(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_idamin==NULL) {
+    if(_h_openblas==NULL || _g_cblas_idamin==NULL) {
         return 0;
     }
     return _g_cblas_idamin(
@@ -736,7 +736,7 @@ CBLAS_INDEX cblas_icamin(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_icamin==NULL) {
+    if(_h_openblas==NULL || _g_cblas_icamin==NULL) {
         return 0;
     }
     return _g_cblas_icamin(
@@ -757,7 +757,7 @@ CBLAS_INDEX cblas_izamin(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_izamin==NULL) {
+    if(_h_openblas==NULL || _g_cblas_izamin==NULL) {
         return 0;
     }
     return _g_cblas_izamin(
@@ -778,7 +778,7 @@ CBLAS_INDEX cblas_ismax(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_ismax==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ismax==NULL) {
         return 0;
     }
     return _g_cblas_ismax(
@@ -799,7 +799,7 @@ CBLAS_INDEX cblas_idmax(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_idmax==NULL) {
+    if(_h_openblas==NULL || _g_cblas_idmax==NULL) {
         return 0;
     }
     return _g_cblas_idmax(
@@ -820,7 +820,7 @@ CBLAS_INDEX cblas_icmax(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_icmax==NULL) {
+    if(_h_openblas==NULL || _g_cblas_icmax==NULL) {
         return 0;
     }
     return _g_cblas_icmax(
@@ -841,7 +841,7 @@ CBLAS_INDEX cblas_izmax(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_izmax==NULL) {
+    if(_h_openblas==NULL || _g_cblas_izmax==NULL) {
         return 0;
     }
     return _g_cblas_izmax(
@@ -862,7 +862,7 @@ CBLAS_INDEX cblas_ismin(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_ismin==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ismin==NULL) {
         return 0;
     }
     return _g_cblas_ismin(
@@ -883,7 +883,7 @@ CBLAS_INDEX cblas_idmin(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_idmin==NULL) {
+    if(_h_openblas==NULL || _g_cblas_idmin==NULL) {
         return 0;
     }
     return _g_cblas_idmin(
@@ -904,7 +904,7 @@ CBLAS_INDEX cblas_icmin(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_icmin==NULL) {
+    if(_h_openblas==NULL || _g_cblas_icmin==NULL) {
         return 0;
     }
     return _g_cblas_icmin(
@@ -925,7 +925,7 @@ CBLAS_INDEX cblas_izmin(
     OPENBLAS_CONST blasint            incx
 )
 {
-    if(_g_cblas_izmin==NULL) {
+    if(_h_openblas==NULL || _g_cblas_izmin==NULL) {
         return 0;
     }
     return _g_cblas_izmin(
@@ -952,7 +952,7 @@ void cblas_saxpy(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_saxpy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_saxpy==NULL) {
         return;
     }
     _g_cblas_saxpy(
@@ -982,7 +982,7 @@ void cblas_daxpy(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_daxpy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_daxpy==NULL) {
         return;
     }
     _g_cblas_daxpy(
@@ -1012,7 +1012,7 @@ void cblas_caxpy(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_caxpy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_caxpy==NULL) {
         return;
     }
     _g_cblas_caxpy(
@@ -1042,7 +1042,7 @@ void cblas_zaxpy(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_zaxpy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zaxpy==NULL) {
         return;
     }
     _g_cblas_zaxpy(
@@ -1070,7 +1070,7 @@ void cblas_scopy(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_scopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_scopy==NULL) {
         return;
     }
     _g_cblas_scopy(
@@ -1097,7 +1097,7 @@ void cblas_dcopy(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_dcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dcopy==NULL) {
         return;
     }
     _g_cblas_dcopy(
@@ -1124,7 +1124,7 @@ void cblas_ccopy(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_ccopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ccopy==NULL) {
         return;
     }
     _g_cblas_ccopy(
@@ -1151,7 +1151,7 @@ void cblas_zcopy(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_zcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zcopy==NULL) {
         return;
     }
     _g_cblas_zcopy(
@@ -1178,7 +1178,7 @@ void cblas_sswap(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_sswap==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sswap==NULL) {
         return;
     }
     _g_cblas_sswap(
@@ -1205,7 +1205,7 @@ void cblas_dswap(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_dswap==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dswap==NULL) {
         return;
     }
     _g_cblas_dswap(
@@ -1232,7 +1232,7 @@ void cblas_cswap(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_cswap==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cswap==NULL) {
         return;
     }
     _g_cblas_cswap(
@@ -1259,7 +1259,7 @@ void cblas_zswap(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_zswap==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zswap==NULL) {
         return;
     }
     _g_cblas_zswap(
@@ -1290,7 +1290,7 @@ void cblas_srot(
     OPENBLAS_CONST float            s
 )
 {
-    if(_g_cblas_srot==NULL) {
+    if(_h_openblas==NULL || _g_cblas_srot==NULL) {
         return;
     }
     _g_cblas_srot(
@@ -1323,7 +1323,7 @@ void cblas_drot(
     OPENBLAS_CONST double            s
 )
 {
-    if(_g_cblas_drot==NULL) {
+    if(_h_openblas==NULL || _g_cblas_drot==NULL) {
         return;
     }
     _g_cblas_drot(
@@ -1350,7 +1350,7 @@ void cblas_srotg(
     float *            s
 )
 {
-    if(_g_cblas_srotg==NULL) {
+    if(_h_openblas==NULL || _g_cblas_srotg==NULL) {
         return;
     }
     _g_cblas_srotg(
@@ -1374,7 +1374,7 @@ void cblas_drotg(
     double *            s
 )
 {
-    if(_g_cblas_drotg==NULL) {
+    if(_h_openblas==NULL || _g_cblas_drotg==NULL) {
         return;
     }
     _g_cblas_drotg(
@@ -1402,7 +1402,7 @@ void cblas_srotm(
     OPENBLAS_CONST float *            P
 )
 {
-    if(_g_cblas_srotm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_srotm==NULL) {
         return;
     }
     _g_cblas_srotm(
@@ -1432,7 +1432,7 @@ void cblas_drotm(
     OPENBLAS_CONST double *            P
 )
 {
-    if(_g_cblas_drotm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_drotm==NULL) {
         return;
     }
     _g_cblas_drotm(
@@ -1460,7 +1460,7 @@ void cblas_srotmg(
     float *            P
 )
 {
-    if(_g_cblas_srotmg==NULL) {
+    if(_h_openblas==NULL || _g_cblas_srotmg==NULL) {
         return;
     }
     _g_cblas_srotmg(
@@ -1487,7 +1487,7 @@ void cblas_drotmg(
     double *            P
 )
 {
-    if(_g_cblas_drotmg==NULL) {
+    if(_h_openblas==NULL || _g_cblas_drotmg==NULL) {
         return;
     }
     _g_cblas_drotmg(
@@ -1512,7 +1512,7 @@ void cblas_sscal(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_sscal==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sscal==NULL) {
         return;
     }
     _g_cblas_sscal(
@@ -1536,7 +1536,7 @@ void cblas_dscal(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_dscal==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dscal==NULL) {
         return;
     }
     _g_cblas_dscal(
@@ -1560,7 +1560,7 @@ void cblas_cscal(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_cscal==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cscal==NULL) {
         return;
     }
     _g_cblas_cscal(
@@ -1584,7 +1584,7 @@ void cblas_zscal(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_zscal==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zscal==NULL) {
         return;
     }
     _g_cblas_zscal(
@@ -1608,7 +1608,7 @@ void cblas_csscal(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_csscal==NULL) {
+    if(_h_openblas==NULL || _g_cblas_csscal==NULL) {
         return;
     }
     _g_cblas_csscal(
@@ -1632,7 +1632,7 @@ void cblas_zdscal(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_zdscal==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zdscal==NULL) {
         return;
     }
     _g_cblas_zdscal(
@@ -1672,7 +1672,7 @@ void cblas_sgemv(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_sgemv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sgemv==NULL) {
         return;
     }
     _g_cblas_sgemv(
@@ -1720,7 +1720,7 @@ void cblas_dgemv(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_dgemv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dgemv==NULL) {
         return;
     }
     _g_cblas_dgemv(
@@ -1768,7 +1768,7 @@ void cblas_cgemv(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_cgemv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cgemv==NULL) {
         return;
     }
     _g_cblas_cgemv(
@@ -1816,7 +1816,7 @@ void cblas_zgemv(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_zgemv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zgemv==NULL) {
         return;
     }
     _g_cblas_zgemv(
@@ -1860,7 +1860,7 @@ void cblas_sger(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_sger==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sger==NULL) {
         return;
     }
     _g_cblas_sger(
@@ -1902,7 +1902,7 @@ void cblas_dger(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_dger==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dger==NULL) {
         return;
     }
     _g_cblas_dger(
@@ -1944,7 +1944,7 @@ void cblas_cgeru(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_cgeru==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cgeru==NULL) {
         return;
     }
     _g_cblas_cgeru(
@@ -1986,7 +1986,7 @@ void cblas_cgerc(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_cgerc==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cgerc==NULL) {
         return;
     }
     _g_cblas_cgerc(
@@ -2028,7 +2028,7 @@ void cblas_zgeru(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_zgeru==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zgeru==NULL) {
         return;
     }
     _g_cblas_zgeru(
@@ -2070,7 +2070,7 @@ void cblas_zgerc(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_zgerc==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zgerc==NULL) {
         return;
     }
     _g_cblas_zgerc(
@@ -2110,7 +2110,7 @@ void cblas_strsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_strsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_strsv==NULL) {
         return;
     }
     _g_cblas_strsv(
@@ -2149,7 +2149,7 @@ void cblas_dtrsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_dtrsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dtrsv==NULL) {
         return;
     }
     _g_cblas_dtrsv(
@@ -2188,7 +2188,7 @@ void cblas_ctrsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ctrsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ctrsv==NULL) {
         return;
     }
     _g_cblas_ctrsv(
@@ -2227,7 +2227,7 @@ void cblas_ztrsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ztrsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ztrsv==NULL) {
         return;
     }
     _g_cblas_ztrsv(
@@ -2266,7 +2266,7 @@ void cblas_strmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_strmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_strmv==NULL) {
         return;
     }
     _g_cblas_strmv(
@@ -2305,7 +2305,7 @@ void cblas_dtrmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_dtrmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dtrmv==NULL) {
         return;
     }
     _g_cblas_dtrmv(
@@ -2344,7 +2344,7 @@ void cblas_ctrmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ctrmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ctrmv==NULL) {
         return;
     }
     _g_cblas_ctrmv(
@@ -2383,7 +2383,7 @@ void cblas_ztrmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ztrmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ztrmv==NULL) {
         return;
     }
     _g_cblas_ztrmv(
@@ -2420,7 +2420,7 @@ void cblas_ssyr(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_ssyr==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ssyr==NULL) {
         return;
     }
     _g_cblas_ssyr(
@@ -2456,7 +2456,7 @@ void cblas_dsyr(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_dsyr==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dsyr==NULL) {
         return;
     }
     _g_cblas_dsyr(
@@ -2492,7 +2492,7 @@ void cblas_cher(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_cher==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cher==NULL) {
         return;
     }
     _g_cblas_cher(
@@ -2528,7 +2528,7 @@ void cblas_zher(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_zher==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zher==NULL) {
         return;
     }
     _g_cblas_zher(
@@ -2568,7 +2568,7 @@ void cblas_ssyr2(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_ssyr2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ssyr2==NULL) {
         return;
     }
     _g_cblas_ssyr2(
@@ -2610,7 +2610,7 @@ void cblas_dsyr2(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_dsyr2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dsyr2==NULL) {
         return;
     }
     _g_cblas_dsyr2(
@@ -2652,7 +2652,7 @@ void cblas_cher2(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_cher2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cher2==NULL) {
         return;
     }
     _g_cblas_cher2(
@@ -2694,7 +2694,7 @@ void cblas_zher2(
     OPENBLAS_CONST blasint            lda
 )
 {
-    if(_g_cblas_zher2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zher2==NULL) {
         return;
     }
     _g_cblas_zher2(
@@ -2744,7 +2744,7 @@ void cblas_sgbmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_sgbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sgbmv==NULL) {
         return;
     }
     _g_cblas_sgbmv(
@@ -2798,7 +2798,7 @@ void cblas_dgbmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_dgbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dgbmv==NULL) {
         return;
     }
     _g_cblas_dgbmv(
@@ -2852,7 +2852,7 @@ void cblas_cgbmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_cgbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cgbmv==NULL) {
         return;
     }
     _g_cblas_cgbmv(
@@ -2906,7 +2906,7 @@ void cblas_zgbmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_zgbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zgbmv==NULL) {
         return;
     }
     _g_cblas_zgbmv(
@@ -2956,7 +2956,7 @@ void cblas_ssbmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_ssbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ssbmv==NULL) {
         return;
     }
     _g_cblas_ssbmv(
@@ -3004,7 +3004,7 @@ void cblas_dsbmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_dsbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dsbmv==NULL) {
         return;
     }
     _g_cblas_dsbmv(
@@ -3048,7 +3048,7 @@ void cblas_stbmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_stbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_stbmv==NULL) {
         return;
     }
     _g_cblas_stbmv(
@@ -3090,7 +3090,7 @@ void cblas_dtbmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_dtbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dtbmv==NULL) {
         return;
     }
     _g_cblas_dtbmv(
@@ -3132,7 +3132,7 @@ void cblas_ctbmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ctbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ctbmv==NULL) {
         return;
     }
     _g_cblas_ctbmv(
@@ -3174,7 +3174,7 @@ void cblas_ztbmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ztbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ztbmv==NULL) {
         return;
     }
     _g_cblas_ztbmv(
@@ -3216,7 +3216,7 @@ void cblas_stbsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_stbsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_stbsv==NULL) {
         return;
     }
     _g_cblas_stbsv(
@@ -3258,7 +3258,7 @@ void cblas_dtbsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_dtbsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dtbsv==NULL) {
         return;
     }
     _g_cblas_dtbsv(
@@ -3300,7 +3300,7 @@ void cblas_ctbsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ctbsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ctbsv==NULL) {
         return;
     }
     _g_cblas_ctbsv(
@@ -3342,7 +3342,7 @@ void cblas_ztbsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ztbsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ztbsv==NULL) {
         return;
     }
     _g_cblas_ztbsv(
@@ -3380,7 +3380,7 @@ void cblas_stpmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_stpmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_stpmv==NULL) {
         return;
     }
     _g_cblas_stpmv(
@@ -3416,7 +3416,7 @@ void cblas_dtpmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_dtpmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dtpmv==NULL) {
         return;
     }
     _g_cblas_dtpmv(
@@ -3452,7 +3452,7 @@ void cblas_ctpmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ctpmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ctpmv==NULL) {
         return;
     }
     _g_cblas_ctpmv(
@@ -3488,7 +3488,7 @@ void cblas_ztpmv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ztpmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ztpmv==NULL) {
         return;
     }
     _g_cblas_ztpmv(
@@ -3524,7 +3524,7 @@ void cblas_stpsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_stpsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_stpsv==NULL) {
         return;
     }
     _g_cblas_stpsv(
@@ -3560,7 +3560,7 @@ void cblas_dtpsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_dtpsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dtpsv==NULL) {
         return;
     }
     _g_cblas_dtpsv(
@@ -3596,7 +3596,7 @@ void cblas_ctpsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ctpsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ctpsv==NULL) {
         return;
     }
     _g_cblas_ctpsv(
@@ -3632,7 +3632,7 @@ void cblas_ztpsv(
     OPENBLAS_CONST blasint            incX
 )
 {
-    if(_g_cblas_ztpsv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ztpsv==NULL) {
         return;
     }
     _g_cblas_ztpsv(
@@ -3674,7 +3674,7 @@ void cblas_ssymv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_ssymv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ssymv==NULL) {
         return;
     }
     _g_cblas_ssymv(
@@ -3719,7 +3719,7 @@ void cblas_dsymv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_dsymv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dsymv==NULL) {
         return;
     }
     _g_cblas_dsymv(
@@ -3764,7 +3764,7 @@ void cblas_chemv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_chemv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_chemv==NULL) {
         return;
     }
     _g_cblas_chemv(
@@ -3809,7 +3809,7 @@ void cblas_zhemv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_zhemv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zhemv==NULL) {
         return;
     }
     _g_cblas_zhemv(
@@ -3852,7 +3852,7 @@ void cblas_sspmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_sspmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sspmv==NULL) {
         return;
     }
     _g_cblas_sspmv(
@@ -3894,7 +3894,7 @@ void cblas_dspmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_dspmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dspmv==NULL) {
         return;
     }
     _g_cblas_dspmv(
@@ -3930,7 +3930,7 @@ void cblas_sspr(
     float *            Ap
 )
 {
-    if(_g_cblas_sspr==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sspr==NULL) {
         return;
     }
     _g_cblas_sspr(
@@ -3963,7 +3963,7 @@ void cblas_dspr(
     double *            Ap
 )
 {
-    if(_g_cblas_dspr==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dspr==NULL) {
         return;
     }
     _g_cblas_dspr(
@@ -3996,7 +3996,7 @@ void cblas_chpr(
     void *            A
 )
 {
-    if(_g_cblas_chpr==NULL) {
+    if(_h_openblas==NULL || _g_cblas_chpr==NULL) {
         return;
     }
     _g_cblas_chpr(
@@ -4029,7 +4029,7 @@ void cblas_zhpr(
     void *            A
 )
 {
-    if(_g_cblas_zhpr==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zhpr==NULL) {
         return;
     }
     _g_cblas_zhpr(
@@ -4066,7 +4066,7 @@ void cblas_sspr2(
     float *            A
 )
 {
-    if(_g_cblas_sspr2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sspr2==NULL) {
         return;
     }
     _g_cblas_sspr2(
@@ -4105,7 +4105,7 @@ void cblas_dspr2(
     double *            A
 )
 {
-    if(_g_cblas_dspr2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dspr2==NULL) {
         return;
     }
     _g_cblas_dspr2(
@@ -4144,7 +4144,7 @@ void cblas_chpr2(
     void *            Ap
 )
 {
-    if(_g_cblas_chpr2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_chpr2==NULL) {
         return;
     }
     _g_cblas_chpr2(
@@ -4183,7 +4183,7 @@ void cblas_zhpr2(
     void *            Ap
 )
 {
-    if(_g_cblas_zhpr2==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zhpr2==NULL) {
         return;
     }
     _g_cblas_zhpr2(
@@ -4228,7 +4228,7 @@ void cblas_chbmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_chbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_chbmv==NULL) {
         return;
     }
     _g_cblas_chbmv(
@@ -4276,7 +4276,7 @@ void cblas_zhbmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_zhbmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zhbmv==NULL) {
         return;
     }
     _g_cblas_zhbmv(
@@ -4320,7 +4320,7 @@ void cblas_chpmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_chpmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_chpmv==NULL) {
         return;
     }
     _g_cblas_chpmv(
@@ -4362,7 +4362,7 @@ void cblas_zhpmv(
     OPENBLAS_CONST blasint            incY
 )
 {
-    if(_g_cblas_zhpmv==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zhpmv==NULL) {
         return;
     }
     _g_cblas_zhpmv(
@@ -4412,7 +4412,7 @@ void cblas_sgemm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_sgemm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sgemm==NULL) {
         return;
     }
     _g_cblas_sgemm(
@@ -4466,7 +4466,7 @@ void cblas_dgemm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_dgemm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dgemm==NULL) {
         return;
     }
     _g_cblas_dgemm(
@@ -4520,7 +4520,7 @@ void cblas_cgemm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_cgemm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cgemm==NULL) {
         return;
     }
     _g_cblas_cgemm(
@@ -4574,7 +4574,7 @@ void cblas_cgemm3m(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_cgemm3m==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cgemm3m==NULL) {
         return;
     }
     _g_cblas_cgemm3m(
@@ -4628,7 +4628,7 @@ void cblas_zgemm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_zgemm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zgemm==NULL) {
         return;
     }
     _g_cblas_zgemm(
@@ -4682,7 +4682,7 @@ void cblas_zgemm3m(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_zgemm3m==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zgemm3m==NULL) {
         return;
     }
     _g_cblas_zgemm3m(
@@ -4734,7 +4734,7 @@ void cblas_ssymm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_ssymm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ssymm==NULL) {
         return;
     }
     _g_cblas_ssymm(
@@ -4785,7 +4785,7 @@ void cblas_dsymm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_dsymm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dsymm==NULL) {
         return;
     }
     _g_cblas_dsymm(
@@ -4836,7 +4836,7 @@ void cblas_csymm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_csymm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_csymm==NULL) {
         return;
     }
     _g_cblas_csymm(
@@ -4887,7 +4887,7 @@ void cblas_zsymm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_zsymm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zsymm==NULL) {
         return;
     }
     _g_cblas_zsymm(
@@ -4934,7 +4934,7 @@ void cblas_ssyrk(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_ssyrk==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ssyrk==NULL) {
         return;
     }
     _g_cblas_ssyrk(
@@ -4979,7 +4979,7 @@ void cblas_dsyrk(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_dsyrk==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dsyrk==NULL) {
         return;
     }
     _g_cblas_dsyrk(
@@ -5024,7 +5024,7 @@ void cblas_csyrk(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_csyrk==NULL) {
+    if(_h_openblas==NULL || _g_cblas_csyrk==NULL) {
         return;
     }
     _g_cblas_csyrk(
@@ -5069,7 +5069,7 @@ void cblas_zsyrk(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_zsyrk==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zsyrk==NULL) {
         return;
     }
     _g_cblas_zsyrk(
@@ -5118,7 +5118,7 @@ void cblas_ssyr2k(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_ssyr2k==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ssyr2k==NULL) {
         return;
     }
     _g_cblas_ssyr2k(
@@ -5169,7 +5169,7 @@ void cblas_dsyr2k(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_dsyr2k==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dsyr2k==NULL) {
         return;
     }
     _g_cblas_dsyr2k(
@@ -5220,7 +5220,7 @@ void cblas_csyr2k(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_csyr2k==NULL) {
+    if(_h_openblas==NULL || _g_cblas_csyr2k==NULL) {
         return;
     }
     _g_cblas_csyr2k(
@@ -5271,7 +5271,7 @@ void cblas_zsyr2k(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_zsyr2k==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zsyr2k==NULL) {
         return;
     }
     _g_cblas_zsyr2k(
@@ -5320,7 +5320,7 @@ void cblas_strmm(
     OPENBLAS_CONST blasint            ldb
 )
 {
-    if(_g_cblas_strmm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_strmm==NULL) {
         return;
     }
     _g_cblas_strmm(
@@ -5368,7 +5368,7 @@ void cblas_dtrmm(
     OPENBLAS_CONST blasint            ldb
 )
 {
-    if(_g_cblas_dtrmm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dtrmm==NULL) {
         return;
     }
     _g_cblas_dtrmm(
@@ -5416,7 +5416,7 @@ void cblas_ctrmm(
     OPENBLAS_CONST blasint            ldb
 )
 {
-    if(_g_cblas_ctrmm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ctrmm==NULL) {
         return;
     }
     _g_cblas_ctrmm(
@@ -5464,7 +5464,7 @@ void cblas_ztrmm(
     OPENBLAS_CONST blasint            ldb
 )
 {
-    if(_g_cblas_ztrmm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ztrmm==NULL) {
         return;
     }
     _g_cblas_ztrmm(
@@ -5512,7 +5512,7 @@ void cblas_strsm(
     OPENBLAS_CONST blasint            ldb
 )
 {
-    if(_g_cblas_strsm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_strsm==NULL) {
         return;
     }
     _g_cblas_strsm(
@@ -5560,7 +5560,7 @@ void cblas_dtrsm(
     OPENBLAS_CONST blasint            ldb
 )
 {
-    if(_g_cblas_dtrsm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dtrsm==NULL) {
         return;
     }
     _g_cblas_dtrsm(
@@ -5608,7 +5608,7 @@ void cblas_ctrsm(
     OPENBLAS_CONST blasint            ldb
 )
 {
-    if(_g_cblas_ctrsm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ctrsm==NULL) {
         return;
     }
     _g_cblas_ctrsm(
@@ -5656,7 +5656,7 @@ void cblas_ztrsm(
     OPENBLAS_CONST blasint            ldb
 )
 {
-    if(_g_cblas_ztrsm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_ztrsm==NULL) {
         return;
     }
     _g_cblas_ztrsm(
@@ -5706,7 +5706,7 @@ void cblas_chemm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_chemm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_chemm==NULL) {
         return;
     }
     _g_cblas_chemm(
@@ -5757,7 +5757,7 @@ void cblas_zhemm(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_zhemm==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zhemm==NULL) {
         return;
     }
     _g_cblas_zhemm(
@@ -5804,7 +5804,7 @@ void cblas_cherk(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_cherk==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cherk==NULL) {
         return;
     }
     _g_cblas_cherk(
@@ -5849,7 +5849,7 @@ void cblas_zherk(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_zherk==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zherk==NULL) {
         return;
     }
     _g_cblas_zherk(
@@ -5898,7 +5898,7 @@ void cblas_cher2k(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_cher2k==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cher2k==NULL) {
         return;
     }
     _g_cblas_cher2k(
@@ -5949,7 +5949,7 @@ void cblas_zher2k(
     OPENBLAS_CONST blasint            ldc
 )
 {
-    if(_g_cblas_zher2k==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zher2k==NULL) {
         return;
     }
     _g_cblas_zher2k(
@@ -5988,7 +5988,7 @@ void cblas_saxpby(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_saxpby==NULL) {
+    if(_h_openblas==NULL || _g_cblas_saxpby==NULL) {
         return;
     }
     _g_cblas_saxpby(
@@ -6021,7 +6021,7 @@ void cblas_daxpby(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_daxpby==NULL) {
+    if(_h_openblas==NULL || _g_cblas_daxpby==NULL) {
         return;
     }
     _g_cblas_daxpby(
@@ -6054,7 +6054,7 @@ void cblas_caxpby(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_caxpby==NULL) {
+    if(_h_openblas==NULL || _g_cblas_caxpby==NULL) {
         return;
     }
     _g_cblas_caxpby(
@@ -6087,7 +6087,7 @@ void cblas_zaxpby(
     OPENBLAS_CONST blasint            incy
 )
 {
-    if(_g_cblas_zaxpby==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zaxpby==NULL) {
         return;
     }
     _g_cblas_zaxpby(
@@ -6124,7 +6124,7 @@ void cblas_somatcopy(
     OPENBLAS_CONST blasint            cldb
 )
 {
-    if(_g_cblas_somatcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_somatcopy==NULL) {
         return;
     }
     _g_cblas_somatcopy(
@@ -6163,7 +6163,7 @@ void cblas_domatcopy(
     OPENBLAS_CONST blasint            cldb
 )
 {
-    if(_g_cblas_domatcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_domatcopy==NULL) {
         return;
     }
     _g_cblas_domatcopy(
@@ -6202,7 +6202,7 @@ void cblas_comatcopy(
     OPENBLAS_CONST blasint            cldb
 )
 {
-    if(_g_cblas_comatcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_comatcopy==NULL) {
         return;
     }
     _g_cblas_comatcopy(
@@ -6241,7 +6241,7 @@ void cblas_zomatcopy(
     OPENBLAS_CONST blasint            cldb
 )
 {
-    if(_g_cblas_zomatcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zomatcopy==NULL) {
         return;
     }
     _g_cblas_zomatcopy(
@@ -6278,7 +6278,7 @@ void cblas_simatcopy(
     OPENBLAS_CONST blasint            cldb
 )
 {
-    if(_g_cblas_simatcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_simatcopy==NULL) {
         return;
     }
     _g_cblas_simatcopy(
@@ -6314,7 +6314,7 @@ void cblas_dimatcopy(
     OPENBLAS_CONST blasint            cldb
 )
 {
-    if(_g_cblas_dimatcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dimatcopy==NULL) {
         return;
     }
     _g_cblas_dimatcopy(
@@ -6350,7 +6350,7 @@ void cblas_cimatcopy(
     OPENBLAS_CONST blasint            cldb
 )
 {
-    if(_g_cblas_cimatcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cimatcopy==NULL) {
         return;
     }
     _g_cblas_cimatcopy(
@@ -6386,7 +6386,7 @@ void cblas_zimatcopy(
     OPENBLAS_CONST blasint            cldb
 )
 {
-    if(_g_cblas_zimatcopy==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zimatcopy==NULL) {
         return;
     }
     _g_cblas_zimatcopy(
@@ -6424,7 +6424,7 @@ void cblas_sgeadd(
     OPENBLAS_CONST blasint            cldc
 )
 {
-    if(_g_cblas_sgeadd==NULL) {
+    if(_h_openblas==NULL || _g_cblas_sgeadd==NULL) {
         return;
     }
     _g_cblas_sgeadd(
@@ -6463,7 +6463,7 @@ void cblas_dgeadd(
     OPENBLAS_CONST blasint            cldc
 )
 {
-    if(_g_cblas_dgeadd==NULL) {
+    if(_h_openblas==NULL || _g_cblas_dgeadd==NULL) {
         return;
     }
     _g_cblas_dgeadd(
@@ -6502,7 +6502,7 @@ void cblas_cgeadd(
     OPENBLAS_CONST blasint            cldc
 )
 {
-    if(_g_cblas_cgeadd==NULL) {
+    if(_h_openblas==NULL || _g_cblas_cgeadd==NULL) {
         return;
     }
     _g_cblas_cgeadd(
@@ -6541,7 +6541,7 @@ void cblas_zgeadd(
     OPENBLAS_CONST blasint            cldc
 )
 {
-    if(_g_cblas_zgeadd==NULL) {
+    if(_h_openblas==NULL || _g_cblas_zgeadd==NULL) {
         return;
     }
     _g_cblas_zgeadd(
@@ -6558,12 +6558,12 @@ void cblas_zgeadd(
 }
 int rindow_load_openblas_dll()
 {
-    if(_h_openblas) {
+    if(_h_openblas!=NULL) {
         return 0;
     }
     _h_openblas = LoadLibraryA( "libopenblas.dll" );
     if(_h_openblas==NULL) {
-        printf("load error: libopenblas");
+        printf("load error: libopenblas\n");
         return -1;
     }
     LOADFUNC(openblas_set_num_threads)
@@ -6754,5 +6754,5 @@ int rindow_load_openblas_dll()
 void rindow_unload_openblas_dll()
 {
     FreeLibrary( _h_openblas );
-    _h_openblas = 0;
+    _h_openblas = NULL;
 }
