@@ -55,6 +55,7 @@ jobs:
         run: |
           export PKG_CONFIG_PATH=$(brew --prefix)/opt/openblas/lib/pkgconfig:$PKG_CONFIG_PATH          
           cd macos
+          cc -v
           cc `pkg-config openblas --cflags` bit2.c `pkg-config openblas --libs` -o bit2
           cc `pkg-config openblas --cflags` tst_edgesvd.c `pkg-config openblas --libs` -o tst_edgesvd
 
