@@ -57,6 +57,13 @@ jobs:
           cd macos
           cc `pkg-config openblas --cflags` bit2.c `pkg-config openblas --libs` -o bit2
 
+      - name: Archive production artifacts
+        if: ${{ startsWith(matrix.os, 'macos-') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: openblas-${{ matrix.artifact_name }}
+          path: /opt/homebrew/opt/openblas/include/*
+
       - name: run
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
@@ -68,3 +75,4 @@ jobs:
         run: |
           cd macos
           ./bit2 isamax 20 1
+          ./bit2 info
