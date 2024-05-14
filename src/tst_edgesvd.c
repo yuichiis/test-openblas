@@ -168,6 +168,7 @@ lapack_int LAPACKE_dgesvd(
     double wkopt;
     double* work;
     lapack_int lwork = -1;
+    lapack_int info;
     dgesvd_( &jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
         &wkopt, &lwork, &info );
     lwork = (int)wkopt;
@@ -176,6 +177,7 @@ lapack_int LAPACKE_dgesvd(
     dgesvd_( &jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
         work, &lwork, &info );
     free( (void*)work );
+    return info;
 }
 #endif
 /*
