@@ -5,7 +5,7 @@
 #include <Accelerate/Accelerate.h>
 typedef const int blasint;
 //typedef const int CBLAS_INDEX;
-typedef const int lapack_int;
+typedef __LAPACK_int lapack_int;
 #else
 #include <cblas.h>
 #endif
