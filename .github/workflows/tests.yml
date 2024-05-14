@@ -49,9 +49,6 @@ jobs:
         run: |
           Invoke-WebRequest -Uri https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.27/OpenBLAS-0.3.27-x64.zip -OutFile win64.zip
           Expand-Archive -Path win64.zip
-          $currentDir = (Get-Location).Path
-          $OpenBLASDir = Join-Path -Path $currentDir -ChildPath 'win64\bin'
-          $env:PATH = "$OpenBLASDir;$env:PATH"
 
       - name: build
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
@@ -102,5 +99,8 @@ jobs:
       - name: run (windows)
         if: ${{ startsWith(matrix.os, 'windows-') }}
         run: |
+          $currentDir = (Get-Location).Path
+          $OpenBLASDir = Join-Path -Path $currentDir -ChildPath 'win64\bin'
+          $env:PATH = "$OpenBLASDir;$env:PATH"
           cd build
           ctest -C Debug
