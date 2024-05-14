@@ -37,7 +37,7 @@ void test_info(int argc, char *argv[])
 }
 void test_sasum(int argc, char *argv[])
 {
-    int i,j;
+    //int i,j;
     int m=1;
     int n=20;
     int k=1;
@@ -46,7 +46,7 @@ void test_sasum(int argc, char *argv[])
     int lda=1;
     int ldb=1;
     int ldc=1;
-    float *a,*b,*c,*x,*y;
+    //float *a,*b,*c,*x,*y;
     float alpha = 1.0;
     float beta =  0.0;
 

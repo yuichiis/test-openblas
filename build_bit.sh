@@ -1,1 +1,0 @@
- cc bit.c `pkg-config openblas --libs`

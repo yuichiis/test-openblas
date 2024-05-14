@@ -1,0 +1,40 @@
+cmake_minimum_required(VERSION 3.14)
+
+project(tests-openblas VERSION 0.1.0 LANGUAGES CXX C)
+enable_testing()
+
+# GoogleTest requires at least C++14
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(MSVC)
+    if(OPENBLAS_DIR)
+        set(CMAKE_PREFIX_PATH "${OPENBLAS_DIR};${CMAKE_PREFIX_PATH}")
+    else()
+        message(FATAL_ERROR "OPENBLAS_DIR found.\nPlease type with a option like\n 'cmake -S . B build -D OPENBLAS_DIR=C:/OpenBLAS'")
+    endif()
+endif()
+
+find_package(OpenBLAS REQUIRED)
+if(MSVC)
+    if(OpenBLAS)
+        set(OpenBLAS_INCLUDE_DIRS ${OPENBLAS_DIR}/include)
+        #find_library(OpenBLAS NAMES libopenblas.lib PATHS ${OPENBLAS_DIR}/lib)
+        #link_directories(${OPENBLAS_DIR})
+        set(ENV{PATH} "$ENV{PATH};${OPENBLAS_DIR}/bin")
+    else()
+        message(WARNING "OpenBLAS not found")
+    endif()
+endif()
+
+message(STATUS "OpenBLAS found: ${OpenBLAS}")
+message(STATUS "OpenBLAS_INCLUDE_DIRS: ${OpenBLAS_INCLUDE_DIRS}")
+
+add_executable(bit2 src/bit2.c)
+
+target_include_directories(bit2 PUBLIC ${OpenBLAS_INCLUDE_DIRS})
+target_link_libraries(bit2 PUBLIC ${OpenBLAS})
+
+add_test(
+  NAME bit2
+  COMMAND bit2 sasum 20 1
+)

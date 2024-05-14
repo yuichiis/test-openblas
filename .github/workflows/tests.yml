@@ -73,9 +73,8 @@ jobs:
         if: ${{ startsWith(matrix.os, 'windows-') }}
         shell: cmd
         run: |
-          "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary\Build\vcvars64.bat"
-          cl -IOpenBLAS\include /MD bit2.c OpenBLAS\lib\libopenblas.lib
-          cl -IOpenBLAS\include /MD tst_edgesvd.c OpenBLAS\lib\libopenblas.lib
+          cmake -S . -B build -D OPENBLAS_DIR=OpenBLAS
+          cmake --build build
 
       ##- name: Archive production artifacts
       ##  if: ${{ startsWith(matrix.os, 'macos-') }}
@@ -103,6 +102,5 @@ jobs:
       - name: run (windows)
         if: ${{ startsWith(matrix.os, 'windows-') }}
         run: |
-          bit2 isamax 20 1
-          bit2 info
-          tst_edgesvd
+          cd build
+          ctest -C Debug

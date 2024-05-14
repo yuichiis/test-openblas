@@ -1,4 +1,5 @@
-vendor/
+/build
+/vendor
 *.log
 *.exe
 *.obj
