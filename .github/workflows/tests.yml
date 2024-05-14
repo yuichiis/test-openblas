@@ -16,12 +16,13 @@ jobs:
           - name: macOS-arm64
             os: macos-latest
             artifact_name: macos-arm64
-          - name: Linux
-            os: ubuntu-latest
-            artifact_name: linux
-          - name: Windows
-            os: windows-latest
-            artifact_name: win64  
+
+##            - name: Linux
+##            os: ubuntu-latest
+##            artifact_name: linux
+##          - name: Windows
+##            os: windows-latest
+##            artifact_name: win64  
 
 ##          - name: macOS-x86_64
 ##            os: macos-13
@@ -36,9 +37,11 @@ jobs:
         run: |
           sudo apt-get install -y libopenblas-dev liblapacke-dev
 
-      #- name: Install OpenBLAS (macOS)
-      #  if: ${{ startsWith(matrix.os, 'macos-') }}
-      #  run: |
+      - name: Install OpenBLAS (macOS)
+        if: ${{ startsWith(matrix.os, 'macos-') }}
+        run: |
+          ls -lR /Applications/Xcode_15.0.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/System/Library/Frameworks/Accelerate.framework
+
       #    brew install openblas
 
       - name: Install OpenBLAS (windows)
