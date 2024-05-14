@@ -3,9 +3,9 @@
 
 #if defined(__APPLE__)
 #include <Accelerate/Accelerate.h>
-typedef const int blasint;
+typedef __LAPACK_int blasint;
 #ifndef CBLAS_INDEX
-typedef const int CBLAS_INDEX;
+typedef __LAPACK_int CBLAS_INDEX;
 #endif
 typedef __LAPACK_int lapack_int;
 #else
