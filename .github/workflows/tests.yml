@@ -68,10 +68,7 @@ jobs:
 
       - name: build (windows)
         if: ${{ startsWith(matrix.os, 'windows-') }}
-        shell: cmd
         run: |
-          Invoke-WebRequest -Uri https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.27/OpenBLAS-0.3.27-x64.zip -OutFile win64.zip
-          Expand-Archive -Path win64.zip
           cmake -S . -B build -D OPENBLAS_DIR=win64
           cmake --build build
 
