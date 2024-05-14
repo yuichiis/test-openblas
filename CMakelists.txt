@@ -18,8 +18,9 @@ find_package(OpenBLAS REQUIRED)
 if(MSVC)
     if(OpenBLAS_VERSION)
         set(OpenBLAS_INCLUDE_DIRS ${OPENBLAS_DIR}/include)
-        set(OpenBLAS_LIBRARIES ${OPENBLAS_DIR}/lib/libopenblas.lib)
-        #find_library(libopenblas NAMES libopenblas.lib PATHS ${OPENBLAS_DIR}/lib)
+        set(OpenBLAS_LIBRARIES ${OPENBLAS_DIR}/lib/libopenblas)
+        find_library(libopenblas NAMES libopenblas.lib PATHS ${OPENBLAS_DIR}/lib)
+        message(STATUS "lib: ${libopenblas}")
         set(ENV{PATH} "$ENV{PATH};${OPENBLAS_DIR}/bin")
     else()
         message(WARNING "OpenBLAS not found")
@@ -34,6 +35,7 @@ add_executable(bit2 src/bit2.c)
 
 target_include_directories(bit2 PUBLIC ${OpenBLAS_INCLUDE_DIRS})
 target_link_libraries(bit2 PUBLIC ${OpenBLAS_LIBRARIES})
+#target_link_libraries(bit2 PUBLIC ${libopenblas})
 
 add_test(
   NAME bit2
