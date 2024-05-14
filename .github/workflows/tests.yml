@@ -53,6 +53,13 @@ jobs:
           cmake -S . -B build
           cmake --build build
 
+      - name: Archive production artifacts
+        if: ${{ startsWith(matrix.os, 'macos-') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: vecLib-${{ matrix.artifact_name }}
+          path: /Applications/Xcode_15.0.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/System/Library/Frameworks/vecLib.framework/Headers/*
+
       - name: build (macOS)
         if: ${{ startsWith(matrix.os, 'macos-') }}
         run: |
