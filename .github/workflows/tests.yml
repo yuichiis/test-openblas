@@ -73,7 +73,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'windows-') }}
         shell: cmd
         run: |
-          cmake -S . -B build -D OPENBLAS_DIR=OpenBLAS
+          cmake -S . -B build -D OPENBLAS_DIR=win64
           cmake --build build
 
       ##- name: Archive production artifacts
