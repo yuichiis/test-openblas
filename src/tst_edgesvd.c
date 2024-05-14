@@ -77,7 +77,12 @@
 #define lapack_complex_float _Fcomplex
 #define lapack_complex_double _Dcomplex
 #endif
+
+#if defined(__APPLE__)
+#include <Accelerate/Accelerate.h>
+#else
 #include <lapacke.h>
+#endif
 
 /* DGESVD prototype */
 //extern void dgesvd_( char* jobu, char* jobvt, int* m, int* n, double* a,

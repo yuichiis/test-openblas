@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(__APPLE__)
+#include <Accelerate/Accelerate.h>
+#else
 #include <cblas.h>
+#endif
+
 #include <string.h>
 #if _MSC_VER
 #include <complex.h>
