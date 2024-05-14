@@ -64,11 +64,10 @@ if(APPLE)
 endif()
 
 
-if(APPLE)
-    add_executable(tst_dgesvd src/tst_dgesvd.c)
-    target_link_libraries(tst_dgesvd PUBLIC ${LAPACKE_LIBRARIES})
-    target_compile_options(tst_dgesvd PRIVATE -DACCELERATE_NEW_LAPACK)
-else()
+add_executable(tst_dgesvd src/tst_dgesvd.c)
+target_link_libraries(tst_dgesvd PUBLIC ${LAPACKE_LIBRARIES})
+target_compile_options(tst_dgesvd PRIVATE -DACCELERATE_NEW_LAPACK)
+if(NOT APPLE)
     add_executable(tst_edgesvd src/tst_edgesvd.c)
     target_include_directories(tst_edgesvd PUBLIC ${LAPACKE_INCLUDE_DIRS})
     if(MSVC)
@@ -86,12 +85,11 @@ add_test(
   NAME bit2_info
   COMMAND bit2 info
 )
-if(APPLE)
-    add_test(
-      NAME tst_dgesvd
-      COMMAND tst_dgesvd
-    )
-else()
+add_test(
+  NAME tst_dgesvd
+  COMMAND tst_dgesvd
+)
+if(NOT APPLE)
     add_test(
       NAME tst_edgesvd
       COMMAND tst_edgesvd
