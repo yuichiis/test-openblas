@@ -14,8 +14,7 @@
 #define lapack_complex_double _Dcomplex
 #endif
 
-#if defined(__APPLE__)
-#else
+#if !defined(__APPLE__)
 #include <lapacke.h>
 #endif
 
@@ -29,6 +28,7 @@ void test_info(int argc, char *argv[])
     printf("sizeof(long)=%zd bit\n",sizeof(long)*8);
     printf("sizeof(long long)=%zd bit\n",sizeof(long long)*8);
     printf("sizeof(size_t)=%zd bit\n",sizeof(size_t)*8);
+#if !defined(__APPLE__)
     printf("threads=%d\n",openblas_get_num_threads());
     printf("procs=%d\n",openblas_get_num_procs());
     printf("config=%s\n",openblas_get_config());
@@ -42,6 +42,7 @@ void test_info(int argc, char *argv[])
         default:                  { para_str = "UNKNOWN"; break; }
     }
     printf("parallel=%d(%s)\n",para_mode,para_str);
+#endif
     printf("--\n");
     printf("\n");
 }
