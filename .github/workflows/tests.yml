@@ -71,6 +71,7 @@ jobs:
         run: |
           $currentDir = (Get-Location).Path
           $OpenBLAS_DIR = Join-Path -Path $currentDir -ChildPath 'openblas'
+          $env:OpenBLAS_DIR = $OpenBLAS_DIR
           cmake -S . -B build
           cmake --build build
 
