@@ -44,14 +44,25 @@ message(STATUS "OpenBLAS_INCLUDE_DIRS: ${OpenBLAS_INCLUDE_DIRS}")
 message(STATUS "LAPACKE_LIBRARIES: ${LAPACKE_LIBRARIES}")
 message(STATUS "LAPACKE_INCLUDE_DIRS: ${LAPACKE_INCLUDE_DIRS}")
 
+if(MSVC)
+    add_subdirectory(./vclib)
+endif()
+
 add_executable(bit2 src/bit2.c)
 target_include_directories(bit2 PUBLIC ${OpenBLAS_INCLUDE_DIRS})
-target_link_libraries(bit2 PUBLIC ${OpenBLAS_LIBRARIES})
+if(MSVC)
+    target_link_libraries(bit2 PUBLIC libopenblas.vclib)
+else()
+    target_link_libraries(bit2 PUBLIC ${OpenBLAS_LIBRARIES})
+endif()
 
 add_executable(tst_edgesvd src/tst_edgesvd.c)
 target_include_directories(tst_edgesvd PUBLIC ${LAPACKE_INCLUDE_DIRS})
-target_link_libraries(tst_edgesvd PUBLIC ${LAPACKE_LIBRARIES})
-
+if(MSVC)
+    target_link_libraries(tst_edgesvd PUBLIC libopenblas.vclib)
+else()
+    target_link_libraries(tst_edgesvd PUBLIC ${LAPACKE_LIBRARIES})
+endif()
 
 add_test(
   NAME bit2
