@@ -13,13 +13,13 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - name: Linux
+            os: ubuntu-latest
+            artifact_name: linux
           - name: Windows
             os: windows-latest
             artifact_name: win64
   
-##          - name: Linux
-##            os: ubuntu-latest
-##            artifact_name: linux
 ##          - name: macOS-arm64
 ##            os: macos-latest
 ##            artifact_name: macos-arm64
@@ -40,7 +40,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'macos-') }}
         run: |
           brew install openblas
-          export PKG_CONFIG_PATH=$(brew --prefix)/opt/openblas/lib/pkgconfig:$PKG_CONFIG_PATH          
+          export PKG_CONFIG_PATH=$(brew --prefix)/opt/openblas/lib/pkgconfig:$PKG_CONFIG_PATH
           pkg-config openblas --libs
 
       - name: Install OpenBLAS (windows)
@@ -54,7 +54,6 @@ jobs:
         run: |
           cmake -S . -B build
           cmake --build build
-          cc tst_edgesvd.c `pkg-config lapacke --libs` -o tst_edgesvd
 
       - name: build (macOS)
         if: ${{ startsWith(matrix.os, 'macos-') }}
@@ -74,20 +73,12 @@ jobs:
           cmake -S . -B build
           cmake --build build
 
-      ##- name: Archive production artifacts
-      ##  if: ${{ startsWith(matrix.os, 'macos-') }}
-      ##  uses: actions/upload-artifact@v4
-      ##  with:
-      ##    name: openblas-${{ matrix.artifact_name }}
-      ##    path: /opt/homebrew/opt/openblas/include/*
-
       - name: run
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
-          cd linux
-          ./bit2 isamax 20 1
-          ./bit2 info
-          ./tst_edgesvd
+          cd build
+          ctest
+          cat Testing/Temporary/LastTest.log
 
       - name: run (macOS)
         if: ${{ startsWith(matrix.os, 'macos-') }}
