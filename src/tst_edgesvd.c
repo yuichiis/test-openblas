@@ -80,6 +80,9 @@
 
 #if defined(__APPLE__)
 #include <Accelerate/Accelerate.h>
+typedef __LAPACK_int lapack_int;
+#define LAPACK_ROW_MAJOR               101
+#define LAPACK_COL_MAJOR               102
 #else
 #include <lapacke.h>
 #endif
@@ -101,7 +104,7 @@ extern void print_matrix( int matrix_layout, char* desc, int m, int n, double* a
 /* Main program */
 int main() {
         /* Locals */
-        int m = M, n = N, lda = LDA, ldu = LDU, ldvt = LDVT, info;
+        lapack_int m = M, n = N, lda = LDA, ldu = LDU, ldvt = LDVT, info;
         //int lwork;
         int matrix_layout = LAPACK_ROW_MAJOR;
         //double wkopt;
@@ -120,8 +123,14 @@ int main() {
         /* Executable statements */
         printf( " DGESVD Example Program Results\n" );
         /* Compute SVD */
+#if defined(__APPLE__)
+        dgesvd_( "A", "A",
+            &m, &n, &a, &lda, &s, &u, &ldu, &vt, &ldvt, &superb );
+        info = 0;
+#else
         info = LAPACKE_dgesvd( matrix_layout, 'A', 'A',
             m, n, a, lda, s, u, ldu, vt, ldvt, superb );
+#endif
         printf("info=%d\n",info);
         if(info) {
             exit( 1 );
