@@ -41,6 +41,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'macos-') }}
         run: |
           ls -alR /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/vecLib
+          find /System/Library/Frameworks/Accelerate.framework -name vecLib -type f /System/Library/Frameworks/Accelerate.framework/Versions/A/vecLib
 
       #    ls -alR /Applications/Xcode_15.0.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/System/Library/Frameworks/vecLib.framework/
       #    file /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/vecLib
