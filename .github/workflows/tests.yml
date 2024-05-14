@@ -47,8 +47,8 @@ jobs:
       - name: Install OpenBLAS (windows)
         if: ${{ startsWith(matrix.os, 'windows-') }}
         run: |
-          Invoke-WebRequest -Uri https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.27/OpenBLAS-0.3.27-x64.zip -OutFile win64.zip
-          Expand-Archive -Path win64.zip
+          Invoke-WebRequest -Uri https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.27/OpenBLAS-0.3.27-x64.zip -OutFile openblas.zip
+          Expand-Archive -Path openblas.zip
 
       - name: build
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
