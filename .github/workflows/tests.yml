@@ -47,10 +47,10 @@ jobs:
       - name: Install OpenBLAS (windows)
         if: ${{ startsWith(matrix.os, 'windows-') }}
         run: |
-          Invoke-WebRequest -Uri https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.27/OpenBLAS-0.3.27-x64.zip -OutFile OpenBLAS.zip
-          Expand-Archive -Path OpenBLAS.zip
+          Invoke-WebRequest -Uri https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.27/OpenBLAS-0.3.27-x64.zip -OutFile win64.zip
+          Expand-Archive -Path win64.zip
           $currentDir = (Get-Location).Path
-          $OpenBLASDir = Join-Path -Path $currentDir -ChildPath 'OpenBLAS\bin'
+          $OpenBLASDir = Join-Path -Path $currentDir -ChildPath 'win64\bin'
           $env:PATH = "$OpenBLASDir;$env:PATH"
 
       - name: build
