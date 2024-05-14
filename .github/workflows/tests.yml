@@ -70,7 +70,8 @@ jobs:
         if: ${{ startsWith(matrix.os, 'windows-') }}
         run: |
           $currentDir = (Get-Location).Path
-          cmake -S . -B build -D OPENBLAS_DIR=$currentDir/win64
+          $OpenBLAS_DIR = Join-Path -Path $currentDir -ChildPath 'openblas'
+          cmake -S . -B build
           cmake --build build
 
       ##- name: Archive production artifacts
@@ -100,8 +101,8 @@ jobs:
         if: ${{ startsWith(matrix.os, 'windows-') }}
         run: |
           $currentDir = (Get-Location).Path
-          $OpenBLASDir = Join-Path -Path $currentDir -ChildPath 'win64\bin'
-          $env:PATH = "$OpenBLASDir;$env:PATH"
+          $OpenBLAS_DIR = Join-Path -Path $currentDir -ChildPath 'openblas'
+          $env:PATH = "$OpenBLAS_DIR/bin;$env:PATH"
           cd build
           ctest -C Debug
           type Testing/Temporary/LastTest.log
