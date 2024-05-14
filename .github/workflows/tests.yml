@@ -104,3 +104,4 @@ jobs:
           $env:PATH = "$OpenBLASDir;$env:PATH"
           cd build
           ctest -C Debug
+          type Testing/Temporary/LastTest.log
