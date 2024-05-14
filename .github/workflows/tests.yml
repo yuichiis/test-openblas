@@ -35,7 +35,6 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
           sudo apt-get install -y libopenblas-dev liblapacke-dev
-          pkg-config openblas --libs
 
       - name: Install OpenBLAS (macOS)
         if: ${{ startsWith(matrix.os, 'macos-') }}
@@ -53,8 +52,8 @@ jobs:
       - name: build
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
-          cd linux
-          cc bit2.c `pkg-config openblas --libs` -o bit2
+          cmake -S . -B build
+          cmake --build build
           cc tst_edgesvd.c `pkg-config lapacke --libs` -o tst_edgesvd
 
       - name: build (macOS)
