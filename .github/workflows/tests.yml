@@ -94,6 +94,7 @@ jobs:
       - name: run (macOS)
         if: ${{ startsWith(matrix.os, 'macos-') }}
         run: |
+          otool -L ./build/bit2 | grep vecLib
           cd build
           ctest
           cat Testing/Temporary/LastTest.log
