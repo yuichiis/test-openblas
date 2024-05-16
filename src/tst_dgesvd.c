@@ -72,6 +72,7 @@
 */
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #if defined(__APPLE__)
     #include <Accelerate/Accelerate.h>
