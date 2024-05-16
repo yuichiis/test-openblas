@@ -74,17 +74,20 @@
 #include <stdio.h>
 
 #if defined(__APPLE__)
-#include <Accelerate/Accelerate.h>
-typedef __LAPACK_int lapack_int;
+    #include <Accelerate/Accelerate.h>
+    typedef __LAPACK_int lapack_int;
 #else
-typedef int lapack_int;
-#define LAPACK_ROW_MAJOR               101
-#define LAPACK_COL_MAJOR               102
-/* DGESVD prototype */
-extern void dgesvd_(
-    char* jobu, char* jobvt, lapack_int* m, lapack_int* n, const double* a,
-    lapack_int* lda, double* s, double* u, lapack_int* ldu, double* vt, lapack_int* ldvt,
-    double* work, lapack_int* lwork, lapack_int* info );
+    typedef int lapack_int;
+    #define LAPACK_ROW_MAJOR               101
+    #define LAPACK_COL_MAJOR               102
+    #ifndef _MSC_VER
+        #define min(a, b) ((a) < (b) ? (a) : (b))
+    #endif
+    /* DGESVD prototype */
+    extern void dgesvd_(
+        char* jobu, char* jobvt, lapack_int* m, lapack_int* n, const double* a,
+        lapack_int* lda, double* s, double* u, lapack_int* ldu, double* vt, lapack_int* ldvt,
+        double* work, lapack_int* lwork, lapack_int* info );
 #endif
 
 /* Auxiliary routines prototypes */
