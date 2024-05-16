@@ -117,8 +117,8 @@ int main() {
     //double* work;
     /* Local arrays */
     double superb[M];
-    double s[N], u[LDU*M], vt[LDVT*N];
-    double a[LDA*M] = {
+    double s[N], u[M*M], vt[N*N];
+    double a[M*N] = {
          8.79,  9.93,  9.83,  5.45,  3.16,
          6.11,  6.91,  5.04, -0.27,  7.98,
         -9.15, -7.93,  4.86,  4.85,  3.01,

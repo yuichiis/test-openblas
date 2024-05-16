@@ -78,71 +78,180 @@
 typedef __LAPACK_int lapack_int;
 #else
 typedef int lapack_int;
+#define LAPACK_ROW_MAJOR               101
+#define LAPACK_COL_MAJOR               102
 /* DGESVD prototype */
 extern void dgesvd_(
-    char* jobu, char* jobvt, lapack_int* m, lapack_int* n, double* a,
+    char* jobu, char* jobvt, lapack_int* m, lapack_int* n, const double* a,
     lapack_int* lda, double* s, double* u, lapack_int* ldu, double* vt, lapack_int* ldvt,
     double* work, lapack_int* lwork, lapack_int* info );
 #endif
 
 /* Auxiliary routines prototypes */
-extern void print_matrix( char* desc, lapack_int m, lapack_int n, double* a, lapack_int lda );
+void print_matrix( int matrix_layout, char* desc, lapack_int m, lapack_int n, double* a, lapack_int lda );
+
+lapack_int E_dgesvd(
+    int matrix_layout,
+    char jobu, char jobvt,
+    lapack_int m, lapack_int n,
+    const double* a,  lapack_int lda,
+    double* s,
+    double* u,  lapack_int ldu,
+    double* vt, lapack_int ldvt,
+    double* superb
+) {
+    double wkopt = 0;
+    double* work = NULL;
+    lapack_int lwork = -1;
+    lapack_int info  = 0;
+    char jobu4[4];
+    char jobvt4[4];
+    jobu4[0] = jobu4[1] = jobu4[2] = jobu4[3] = jobu;
+    jobvt4[0] = jobvt4[1] = jobvt4[2] = jobvt4[3] = jobvt;
+    double* targetA;
+    double* targetU;
+    double* targetVT;
+    double* buffA = NULL;
+    double* buffU = NULL;
+    double* buffVT = NULL;
+
+    if(matrix_layout==LAPACK_ROW_MAJOR) {
+        printf("ROW_MAJOR\n");
+        targetA = buffA = malloc( m*n*sizeof(double) );
+        memcpy(targetA, a, m*n*sizeof(double) );
+        for(int i=0; i<m; i++) {
+            for(int j=0; j<n; j++) {
+                targetA[j*m+i] = a[i*n+j];
+            }
+        }
+        targetU = buffU = malloc( m*m*sizeof(double) );
+        targetVT = buffVT = malloc( n*n*sizeof(double) );
+        memcpy(targetU,  u,  m*m*sizeof(double) );
+        memcpy(targetVT, vt, n*n*sizeof(double) );
+        lda = m;
+    } else if(matrix_layout==LAPACK_COL_MAJOR) {
+        printf("COL_MAJOR\n");
+        targetA = (double *)a;
+        targetU = u;
+        targetVT = vt;
+    } else {
+        printf("Invalid matrix_layout: %d\n",matrix_layout);
+        info = 1;
+        goto final_E_dgesvd;
+    }
+
+    printf("AAAAAAAAAAAAAAAAAA\n");
+    dgesvd_( jobu4, jobvt4, &m, &n, targetA, &lda, s, targetU, &ldu, targetVT, &ldvt, &wkopt, &lwork, &info);
+    printf("BBBBBBBBBBBBBBBBBBB\n");
+    if( info != 0 ) {
+        goto final_E_dgesvd;
+    }
+    lwork = (int)wkopt;
+    work = (double*)malloc( lwork*sizeof(double) );
+    printf("CCCCCCCCCCCCCCCCCC\n");
+    /* Compute SVD */
+    dgesvd_( jobu4, jobvt4, &m, &n, targetA, &lda, s, targetU, &ldu, targetVT, &ldvt, work, &lwork, &info );
+    printf("DDDDDDDDDDDDDDDDDD\n");
+    if( info != 0 ) {
+        goto final_E_dgesvd;
+    }
+
+    for(int i=0; i<min(m,n)-1; i++ ) {
+        superb[i] = work[i+1];
+    }
+    if(matrix_layout==LAPACK_ROW_MAJOR) {
+        for(int i=0;i<m;i++) {
+            for(int j=0;j<m;j++) {
+                u[j*m+i] = targetU[i*m+j];
+            }
+        }
+        for(int i=0;i<n;i++) {
+            for(int j=0;j<n;j++) {
+                vt[j*n+i] = targetVT[i*n+j];
+            }
+        }
+    }
+
+final_E_dgesvd:
+    if(work!=NULL) {
+        free(work);
+    }
+    if(buffA!=NULL) {
+        free(buffA);
+    }
+    if(buffU!=NULL) {
+        free(buffU);
+    }
+    if(buffVT!=NULL) {
+        free(buffVT);
+    }
+    return info;
+}
 
 /* Parameters */
 #define M 6
 #define N 5
-#define LDA M
+#define LDA N
 #define LDU M
 #define LDVT N
+
+///* Parameters */
+//#define M 6
+//#define N 5
+//#define LDA M
+//#define LDU M
+//#define LDVT N
+
 
 /* Main program */
 int main() {
     /* Locals */
-    lapack_int m = M, n = N, lda = LDA, ldu = LDU, ldvt = LDVT, info, lwork;
-    double wkopt;
-    double* work;
+    lapack_int m = M, n = N, lda = LDA, ldu = LDU, ldvt = LDVT, info;
+    //int lwork;
+    int matrix_layout = LAPACK_ROW_MAJOR;
+    //double wkopt;
+    //double* work;
     /* Local arrays */
-    double s[N], u[LDU*M], vt[LDVT*N];
-    double a[LDA*N] = {
-        8.79,  6.11, -9.15,  9.57, -3.49,  9.84,
-        9.93,  6.91, -7.93,  1.64,  4.02,  0.15,
-        9.83,  5.04,  4.86,  8.83,  9.80, -8.99,
-        5.45, -0.27,  4.85,  0.74, 10.00, -6.02,
-        3.16,  7.98,  3.01,  5.80,  4.27, -5.31
+    double superb[M];
+    double s[N], u[M*M], vt[N*N];
+    double a[M*N] = {
+         8.79,  9.93,  9.83,  5.45,  3.16,
+         6.11,  6.91,  5.04, -0.27,  7.98,
+        -9.15, -7.93,  4.86,  4.85,  3.01,
+         9.57,  1.64,  8.83,  0.74,  5.80,
+        -3.49,  4.02,  9.80, 10.00,  4.27,
+         9.84,  0.15, -8.99, -6.02, -5.31
     };
     /* Executable statements */
     printf( " DGESVD Example Program Results\n" );
-    /* Query and allocate the optimal workspace */
-    lwork = -1;
-    dgesvd_( "All", "All", &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, &wkopt, &lwork,
-     &info );
-    lwork = (int)wkopt;
-    work = (double*)malloc( lwork*sizeof(double) );
     /* Compute SVD */
-    dgesvd_( "All", "All", &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork,
-     &info );
-    /* Check for convergence */
-    if( info > 0 ) {
-        printf( "The algorithm computing SVD failed to converge.\n" );
+    info = E_dgesvd( matrix_layout, 'A', 'A',
+        m, n, a, lda, s, u, ldu, vt, ldvt, superb );
+    printf("info=%d\n",info);
+    if(info) {
         exit( 1 );
     }
     /* Print singular values */
-    print_matrix( "Singular values", 1, n, s, 1 );
+    print_matrix( matrix_layout, "Singular values(s)", 1, n, s, 1 );
     /* Print left singular vectors */
-    print_matrix( "Left singular vectors (stored columnwise)", m, n, u, ldu );
+    print_matrix( matrix_layout, "Left singular vectors(u) (stored columnwise)", m, m, u, ldu );
     /* Print right singular vectors */
-    print_matrix( "Right singular vectors (stored rowwise)", n, n, vt, ldvt );
+    print_matrix( matrix_layout, "Right singular vectors(vt) (stored rowwise)", n, n, vt, ldvt );
     /* Free workspace */
-    free( (void*)work );
     exit( 0 );
 } /* End of DGESVD Example */
 
 /* Auxiliary routine: printing a matrix */
-void print_matrix( char* desc, lapack_int m, lapack_int n, double* a, lapack_int lda ) {
-    lapack_int i, j;
-    printf( "\n %s\n", desc );
+void print_matrix( int matrix_layout, char* desc, int m, int n, double* a, int lda ) {
+    int i, j;
+    int ldm, ldn;
+    if(matrix_layout==LAPACK_ROW_MAJOR) { ldm = lda; ldn = 1; }
+    else                                { ldm = 1; ldn = lda; }
+    //printf( "\n %s\n", desc );
     for( i = 0; i < m; i++ ) {
-        for( j = 0; j < n; j++ ) printf( " %6.2f", a[i+j*lda] );
-        printf( "\n" );
+            for( j = 0; j < n; j++ ) printf( " %6.2lf", a[i*ldm+j*ldn] );
+            //for( j = 0; j < n; j++ ) printf( " %le", a[i*ldm+j*ldn] );
+            printf( "\n" );
     }
 }
+
