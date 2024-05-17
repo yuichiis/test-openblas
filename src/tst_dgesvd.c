@@ -108,10 +108,10 @@ lapack_int E_dgesvd(
     double* work = NULL;
     lapack_int lwork = -1;
     lapack_int info  = 0;
-    char jobu4[4];
-    char jobvt4[4];
-    jobu4[0] = jobu4[1] = jobu4[2] = jobu4[3] = jobu;
-    jobvt4[0] = jobvt4[1] = jobvt4[2] = jobvt4[3] = jobvt;
+    char jobu4[4] = {0,0,0,0};
+    char jobvt4[4] = {0,0,0,0};
+    jobu4[0] = jobu;
+    jobvt4[0] = jobvt;
     double* targetA;
     double* targetU;
     double* targetVT;
