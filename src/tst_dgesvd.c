@@ -77,13 +77,13 @@
 typedef int lapack_int;
 #define LAPACK_ROW_MAJOR               101
 #define LAPACK_COL_MAJOR               102
+#ifndef _MSC_VER
+    #define min(a, b) ((a) < (b) ? (a) : (b))
+#endif
 #if defined(__APPLE__)
     #include <Accelerate/Accelerate.h>
     typedef __LAPACK_int lapack_int;
 #else
-    #ifndef _MSC_VER
-        #define min(a, b) ((a) < (b) ? (a) : (b))
-    #endif
     /* DGESVD prototype */
     extern void dgesvd_(
         char* jobu, char* jobvt, lapack_int* m, lapack_int* n, const double* a,
