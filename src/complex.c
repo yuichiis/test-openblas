@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <cblas.h>
 #include <string.h>
 
@@ -59,7 +60,7 @@ void test_cdot(int argc, char *argv[])
     printf("\n");
     print_complex(n,y1);
     printf("\n");
-    result = cblas_cdotu(n, x1, incx, y1, incy);
+    cblas_cdotu_sub(n, x1, incx, y1, incy, &result);
     print_complex(1,&result);
     printf("--\n");
     printf("--\n");
@@ -69,7 +70,7 @@ void test_cdot(int argc, char *argv[])
     printf("\n");
     print_complex(n,y1);
     printf("\n");
-    result = cblas_cdotc(n, x1, incx, y1, incy);
+    cblas_cdotc_sub(n, x1, incx, y1, incy, &result);
     print_complex(1,&result);
     printf("--\n");
     printf("--\n");

@@ -87,6 +87,13 @@ if(NOT APPLE)
     #endif()
 endif()
 
+add_executable(complex src/complex.c)
+target_include_directories(complex PUBLIC ${OpenBLAS_INCLUDE_DIRS})
+target_link_libraries(complex PUBLIC ${OpenBLAS_LIBRARIES})
+if(APPLE)
+    target_compile_options(complex PRIVATE -DACCELERATE_NEW_LAPACK)
+endif()
+
 add_test(
   NAME bit2
   COMMAND bit2 sasum 20 1
@@ -105,3 +112,7 @@ if(NOT APPLE)
       COMMAND tst_edgesvd
     )
 endif()
+add_test(
+  NAME complex
+  COMMAND complex
+)
