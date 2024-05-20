@@ -15,7 +15,7 @@
 
 void print_complex(int n, void *x)
 {
-    openblas_complex_float* c = x;
+    complex_float* c = x;
     for(int i=0;i<n;i++) {
         printf("[%f+%fi],",
             get_float_real(c[i]),
