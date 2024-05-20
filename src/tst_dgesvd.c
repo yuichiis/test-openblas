@@ -74,13 +74,13 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef int lapack_int;
+#define LAPACK_ROW_MAJOR               101
+#define LAPACK_COL_MAJOR               102
 #if defined(__APPLE__)
     #include <Accelerate/Accelerate.h>
     typedef __LAPACK_int lapack_int;
 #else
-    typedef int lapack_int;
-    #define LAPACK_ROW_MAJOR               101
-    #define LAPACK_COL_MAJOR               102
     #ifndef _MSC_VER
         #define min(a, b) ((a) < (b) ? (a) : (b))
     #endif
