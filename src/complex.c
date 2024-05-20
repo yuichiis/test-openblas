@@ -1,15 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <cblas.h>
 #include <string.h>
+#if defined(__APPLE__)
+    #include <Accelerate/Accelerate.h>
+    #define get_float_real(c)   creal((c))
+    #define get_float_imag(c)   cimag((c))
+    typedef __LAPACK_float_complex  complex_float;
+#else
+    #include <cblas.h>
+    #define get_float_real(c)   openblas_complex_float_real((c))
+    #define get_float_imag(c)   openblas_complex_float_imag((c))
+    typedef openblas_complex_float  complex_float;
+#endif
 
 void print_complex(int n, void *x)
 {
     openblas_complex_float* c = x;
     for(int i=0;i<n;i++) {
         printf("[%f+%fi],",
-            openblas_complex_float_real(c[i]),
-            openblas_complex_float_imag(c[i])
+            get_float_real(c[i]),
+            get_float_imag(c[i])
         );
     }
 }
@@ -18,7 +28,7 @@ void test_cscal(int argc, char *argv[])
 {
     int n=4;
     int incx=1;
-    float alpha[2] = {0.0, 1.0};
+    complex_float alpha = {0.0, 1.0};
 
     if(argc>1)
         n=atoi(argv[1]);
@@ -27,7 +37,7 @@ void test_cscal(int argc, char *argv[])
     printf("n=%d,incx=%d\n",n,incx);
 
     //                  0            1            2            3
-    float x1[4][2] = {  {1.0, 0.0},  {0.0, 1.0},  {1.0, 2.0},  {3.0, 4.0} };
+    complex_float x1[4] = {  {1.0, 0.0},  {0.0, 1.0},  {1.0, 2.0},  {3.0, 4.0} };
     printf("cscal--\n");
     print_complex(n,x1);
     printf("\n");
@@ -41,7 +51,7 @@ void test_cscal(int argc, char *argv[])
 
 void test_cdot(int argc, char *argv[])
 {
-    openblas_complex_float result;
+    complex_float result;
     int n=4;
     int incx=1;
     int incy=1;
@@ -52,9 +62,9 @@ void test_cdot(int argc, char *argv[])
         incx=atoi(argv[2]);
     printf("n=%d,incx=%d\n",n,incx);
 
-    //                  0            1            2            3
-    float x1[4][2] = {  {1.0, 0.0},  {0.0, 1.0},  {1.0, 2.0},  {3.0, 4.0} };
-    float y1[4][2] = {  {0.0, 1.0},  {1.0, 0.0},  {2.0, 1.0},  {4.0, 3.0} };
+    //                          0            1            2            3
+    complex_float x1[4] = {  {1.0, 0.0},  {0.0, 1.0},  {1.0, 2.0},  {3.0, 4.0} };
+    complex_float y1[4] = {  {0.0, 1.0},  {1.0, 0.0},  {2.0, 1.0},  {4.0, 3.0} };
     printf("cdotu--\n");
     print_complex(n,x1);
     printf("\n");
